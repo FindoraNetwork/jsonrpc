@@ -55,6 +55,7 @@ pub enum MiddlewareAction {
 }
 
 impl MiddlewareAction {
+	#[cfg(feature = "check-origin")]
 	fn should_verify_origin(&self) -> bool {
 		use self::MiddlewareAction::*;
 
@@ -64,6 +65,12 @@ impl MiddlewareAction {
 		}
 	}
 
+	#[cfg(not(feature = "check-origin"))]
+	fn should_verify_origin(&self) -> bool {
+		false
+	}
+
+	#[cfg(feature = "check-host")]
 	fn should_verify_hosts(&self) -> bool {
 		use self::MiddlewareAction::*;
 
@@ -71,6 +78,11 @@ impl MiddlewareAction {
 			Proceed => true,
 			Respond { validate_hosts, .. } => validate_hosts,
 		}
+	}
+
+	#[cfg(not(feature = "check-host"))]
+	fn should_verify_hosts(&self) -> bool {
+		false
 	}
 }
 
